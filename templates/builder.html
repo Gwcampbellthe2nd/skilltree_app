@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ tree_name }} - Skill Tree Builder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/vis.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/vis.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/skilltree.js') }}"></script>
+</head>
+<body>
+
+    <h1>{{ tree_name }} - Skill Tree Builder</h1>
+
+    <div class="buttons">
+        <button onclick="addNode()">Add Node</button>
+        <button onclick="addEdge()">Add Edge</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+        <button onclick="saveGraph()">Save Graph</button>
+        <a href="/" class="back-button" onclick="saveGraph()">← Back to Main Page</a>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="handleFileImport(event)">
+
+    <div id="container">
+        <div id="skilltree"></div>
+        <div id="notes">
+            <h3>Notes</h3>
+            <textarea id="notesTextarea" placeholder="Write your notes here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        const treeName = "{{ tree_name }}";
+        initializeNetwork();
+        addRootNode(treeName);
+        loadGraph()
+    </script>
+</body>
+</html>

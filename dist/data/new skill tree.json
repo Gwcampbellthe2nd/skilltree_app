@@ -1,0 +1,27 @@
+{
+    "nodes": [
+        {
+            "color": {
+                "background": "#FFD700",
+                "border": "#DAA520"
+            },
+            "font": {
+                "color": "#000",
+                "size": 16
+            },
+            "id": 1,
+            "label": "",
+            "size": 30,
+            "title": "new skill tree"
+        },
+        {
+            "id": "38404c0f-1e55-45d7-8e1a-3c8de4ab2fb2",
+            "label": "New Skill",
+            "size": 15,
+            "x": 55,
+            "y": -29.125
+        }
+    ],
+    "edges": [],
+    "notes": "notes"
+}
