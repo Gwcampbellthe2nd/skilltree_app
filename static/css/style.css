@@ -66,7 +66,6 @@ form button:hover {
 /* Skill Tree Display */
 #skilltree {
     width: 70%;
-    height: 100%;
     border: 1px solid #ccc;
     background-color: white;
     border-radius: 8px;
@@ -77,7 +76,6 @@ form button:hover {
 /* Notes Sidebar */
 #notes {
     width: 30%;
-    height: 100%;
     padding: 10px;
     background-color: #f8f9fa;
     border-left: 1px solid #ccc;
@@ -273,4 +271,81 @@ footer {
     font-size: 12px;
     color: #777;
     text-align: center;
+}
+
+/* General button styling */
+button {
+    background-color: #0288d1; /* Default blue background */
+    color: #fff; /* White text */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin: 5px; /* Spacing between buttons */
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #026ca0; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Disabled button styling */
+button:disabled {
+    background-color: #ccc; /* Gray background for disabled state */
+    color: #666; /* Lighter text for disabled state */
+    cursor: not-allowed;
+}
+
+/* Mark Complete button specific styling */
+#markCompleteButton {
+    background-color: #4caf50; /* Green background */
+    color:white;
+}
+
+#markCompleteButton:hover {
+    background-color: #388e3c; /* Darker green on hover */
+}
+
+/* Mark Not Complete button specific styling */
+#markNotCompleteButton {
+    background-color: #0288d1; /* Blue background */
+    color:white;
+}
+
+#markNotCompleteButton:hover {
+    background-color: #026ca0; /* Darker blue on hover */
+}
+
+/* Notes section styling */
+#notes {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
+}
+
+/* Notes header styling */
+#notesHeader {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Notes textarea styling */
+#notesTextarea {
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    background-color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }

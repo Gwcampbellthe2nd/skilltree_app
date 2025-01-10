@@ -1,0 +1,42 @@
+{
+    "nodes": [
+        {
+            "id": "0920a008-cc49-4956-b805-80ce39bd2eb8",
+            "x": 58.5,
+            "y": -128.125,
+            "label": "New Skill",
+            "size": 15
+        },
+        {
+            "id": "39e51b31-7ae8-4669-acd5-3664ef87044f",
+            "x": 107.5,
+            "y": -294.125,
+            "label": "New Skill",
+            "size": 15
+        },
+        {
+            "id": "8a52d60a-e7f8-4140-8fdc-a94144beaa9d",
+            "x": 34.5,
+            "y": -200.125,
+            "label": "New Skill",
+            "size": 15
+        }
+    ],
+    "edges": [
+        {
+            "from": "0920a008-cc49-4956-b805-80ce39bd2eb8",
+            "to": "39e51b31-7ae8-4669-acd5-3664ef87044f",
+            "id": "c40f6dad-6ea7-4a04-802c-0cbf04e9d829"
+        },
+        {
+            "from": "39e51b31-7ae8-4669-acd5-3664ef87044f",
+            "to": "8a52d60a-e7f8-4140-8fdc-a94144beaa9d",
+            "id": "4eec384f-3c6b-4377-8553-7e3ba732cea6"
+        }
+    ],
+    "notes": {
+        "0920a008-cc49-4956-b805-80ce39bd2eb8": "",
+        "39e51b31-7ae8-4669-acd5-3664ef87044f": "",
+        "8a52d60a-e7f8-4140-8fdc-a94144beaa9d": "this is the node info for this one"
+    }
+}

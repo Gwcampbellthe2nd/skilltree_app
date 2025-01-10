@@ -26,9 +26,13 @@
     <div id="container">
         <div id="skilltree"></div>
         <div id="notes">
-            <h3>Notes</h3>
-            <textarea id="notesTextarea" placeholder="Write your notes here..."></textarea>
+            <h3 id="notesHeader">Select a Node to View Notes</h3>
+            <textarea id="notesTextarea" placeholder="Write your notes here..." onblur="saveCurrentNotes()"></textarea>
+            <button id="markCompleteButton" onclick="markNodeComplete()" disabled>Mark Complete</button>
+            <button id="markNotCompleteButton" onclick="markNodeNotComplete()" disabled>Mark Not Complete</button>
         </div>
+        
+        
     </div>
 
     <script>
