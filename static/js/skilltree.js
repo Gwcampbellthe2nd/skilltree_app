@@ -14,8 +14,8 @@ const options = {
         labelAlignment: 'below'
     },
     edges: {
-        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
-        smooth: { type: 'cubicBezier' },
+        arrows: { to: { enabled: false, scaleFactor: 0.5 } },
+        smooth: { type: 'discrete' },
         color: { color: "#0288d1" },
         width: 1
     },
@@ -87,24 +87,39 @@ function initializeNetwork() {
  */
 function updateNotesSection(nodeId) {
     const notesTextarea = document.getElementById('notesTextarea');
+    const node = nodes.get(nodeId); // Fetch the node details using the ID
+    const nodeLabel = node.label || `Node ${nodeId}`; // Use label or fallback to ID
+
+    // Populate the notes for the selected node
     notesTextarea.value = nodeNotes[nodeId] || "";
     notesTextarea.dataset.currentNode = nodeId; // Track the current node ID
-    document.getElementById('notesHeader').innerText = `Notes for Node ${nodeId}`;
+    document.getElementById('notesHeader').innerText = `Notes for: ${nodeLabel}`;
 
     // Enable the "Complete" and "Not Complete" buttons
     document.getElementById('markCompleteButton').disabled = false;
     document.getElementById('markNotCompleteButton').disabled = false;
+
+    // Add input event listener to save notes as the user types
+    notesTextarea.oninput = () => {
+        nodeNotes[nodeId] = notesTextarea.value;
+    };
 }
 
 /**
- * Save the current notes for the selected node.
+ * Clear the notes section when no node is selected.
  */
-function saveCurrentNotes() {
+function clearNotesSection() {
     const notesTextarea = document.getElementById('notesTextarea');
-    const currentNodeId = notesTextarea.dataset.currentNode;
-    if (currentNodeId) {
-        nodeNotes[currentNodeId] = notesTextarea.value;
-    }
+    notesTextarea.value = "";
+    delete notesTextarea.dataset.currentNode;
+    document.getElementById('notesHeader').innerText = "Select a Node to View Notes";
+
+    // Disable the "Complete" and "Not Complete" buttons
+    document.getElementById('markCompleteButton').disabled = true;
+    document.getElementById('markNotCompleteButton').disabled = true;
+
+    // Remove the input event listener
+    notesTextarea.oninput = null;
 }
 
 /**
@@ -162,19 +177,52 @@ function updateEdges() {
     });
 }
 
-/**
- * Clear the notes section when no node is selected.
- */
-function clearNotesSection() {
-    const notesTextarea = document.getElementById('notesTextarea');
-    notesTextarea.value = "";
-    delete notesTextarea.dataset.currentNode;
-    document.getElementById('notesHeader').innerText = "Select a Node to View Notes";
 
-    // Disable the "Complete" and "Not Complete" buttons
-    document.getElementById('markCompleteButton').disabled = true;
-    document.getElementById('markNotCompleteButton').disabled = true;
+/**
+ * Extract the tree name from the URL path.
+ */
+function getTreeNameFromURL() {
+    const pathParts = window.location.pathname.split('/');
+    return pathParts[pathParts.length - 1]; // The last part of the URL is the tree name
 }
+
+/**
+ * Save the current graph (nodes and edges) to the server.
+ */
+function saveGraph() {
+    const treeName = getTreeNameFromURL();
+    if (!treeName) {
+        alert('No tree name found in the URL. Unable to save the skill tree.');
+        return;
+    }
+
+    const graphData = {
+        nodes: nodes.get(), // Get all nodes
+        edges: edges.get(), // Get all edges
+        notes: nodeNotes, // Include notes for nodes
+    };
+
+    fetch(`/save/${encodeURIComponent(treeName)}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(graphData),
+    })
+        .then((response) => {
+            if (response.ok) {
+                alert(`Skill tree '${treeName}' saved successfully!`);
+            } else {
+                alert(`Failed to save skill tree '${treeName}'.`);
+            }
+        })
+        .catch((error) => {
+            console.error('Error saving skill tree:', error);
+            alert('An error occurred while saving the skill tree.');
+        });
+}
+
+
 
 /**
  * Add a new node to the graph.

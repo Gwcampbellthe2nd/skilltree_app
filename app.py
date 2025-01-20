@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for
 import os
 import json
+from urllib.parse import unquote
 
 app = Flask(__name__)
 
@@ -25,6 +26,8 @@ def builder(tree_name):
 @app.route('/save/<tree_name>', methods=['POST'])
 def save_tree(tree_name):
     """Save a skill tree with a given name, including notes."""
+    # Decode the tree name to handle spaces and special characters
+    tree_name = unquote(tree_name)
     data = request.json
     file_path = os.path.join(DATA_DIR, f'{tree_name}.json')
     with open(file_path, 'w') as f:
