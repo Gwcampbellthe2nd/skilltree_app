@@ -115,11 +115,12 @@ form button:hover {
     border-radius: 4px;
     background-color: #007bff;
     color: white;
-    transition: background-color 0.3s ease;
+    transition: .25s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .buttons button:hover {
     background-color: #0056b3;
+    transition: .25s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .buttons .back-button {
@@ -131,11 +132,14 @@ form button:hover {
     border-radius: 4px;
     text-decoration: none;
     font-size: 14px;
+    transition: .25s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 .buttons .back-button:hover {
     background-color: #5a6268;
+    transition: .25s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
+
 
 /* Saved Skill Trees Section */
 .saved-trees {
@@ -374,6 +378,11 @@ button:disabled {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     max-width: 400px;
     width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: space-around;
+    align-items: center;
 }
 
 /* Modal message */
@@ -427,4 +436,11 @@ button:disabled {
 
 .cancel-button:hover {
     background-color: #d32f2f;
+}
+
+input#renameInput {
+    margin-top: 2.5%;
+    padding: 2.5%;
+    border-radius: 1em;
+    border: 1px solid gray;
 }

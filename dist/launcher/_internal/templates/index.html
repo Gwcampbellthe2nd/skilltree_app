@@ -42,10 +42,13 @@
             window.location.href = `/builder/${treeName}`;
         }
 
-        function deleteTree(treeName) {
-            if (confirm(`Are you sure you want to delete '${treeName}'?`)) {
-                fetch(`/delete/${treeName}`, { method: 'DELETE' })
-                    .then(response => response.json())
+        function deleteTree(tree) {
+            if (confirm(`Are you sure you want to delete '${tree}'?`)) {
+                fetch(`/delete/${tree}`, { method: 'DELETE' })
+                    .then(response => {
+                        response.json();
+                        location.reload();
+                    })
                     .then(data => {
                         showAlert(data.message || data.error);
                         location.reload();

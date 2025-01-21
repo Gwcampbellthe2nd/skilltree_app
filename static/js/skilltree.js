@@ -52,9 +52,20 @@ function initializeNetwork() {
     const container = document.getElementById('skilltree');
     const data = { nodes, edges };
 
+    // Initialize the network
     network = new vis.Network(container, data, options);
 
-    // Handle node selection to display its notes
+    // Trigger a redraw after stabilization
+    network.once('stabilized', () => {
+        network.fit(); // Adjust the view to fit all nodes
+    });
+
+    // Ensure resizing works on window resize
+    window.addEventListener('resize', () => {
+        network.redraw();
+    });
+
+    // Handle node selection and other events (as before)
     network.on("selectNode", (params) => {
         if (params.nodes.length > 0) {
             const nodeId = params.nodes[0];
@@ -62,19 +73,18 @@ function initializeNetwork() {
         }
     });
 
-    // Clear notes if no node is selected
     network.on("deselectNode", () => {
         clearNotesSection();
     });
 
-    // Handle node double-click to open rename modal
     network.on("doubleClick", (params) => {
         if (params.nodes.length > 0) {
             const nodeId = params.nodes[0];
-            openRenameModal(nodeId); // Open the modal for renaming
+            openRenameModal(nodeId);
         }
     });
 }
+
 
 /**
  * Update the notes section for a specific node.
@@ -124,7 +134,7 @@ function markNodeComplete() {
 
     if (selectedNodes.length > 0) {
         const nodeId = selectedNodes[0];
-        nodes.update({ id: nodeId, color: { background: "#4caf50" } }); // Green
+        nodes.update({ id: nodeId, color: { background: "#4caf50", border: "#38823b" }, font: { color: "#fff" } }); // Green
         updateEdges(); // Update edges after marking node as complete
     } else {
         showAlert("No node selected! Please select a node to mark as complete.");
@@ -196,7 +206,6 @@ function saveGraph() {
     })
         .then((response) => {
             if (response.ok) {
-                showAlert(`Skill tree '${treeName}' saved successfully!`);
             } else {
                 showAlert(`Failed to save skill tree '${treeName}'.`);
             }
@@ -206,6 +215,87 @@ function saveGraph() {
             showAlert('An error occurred while saving the skill tree.');
         });
 }
+
+/**
+ * Load the graph for the current skill tree.
+ */
+function loadGraph() {
+    fetch(`/load/${encodeURIComponent(treeName)}`)
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                console.warn(`No saved graph found for '${treeName}'.`);
+                return null;
+            }
+        })
+        .then((data) => {
+            if (data) {
+                // Populate nodes, edges, and notes from the fetched data
+                nodes.add(data.nodes);
+                edges.add(data.edges);
+                nodeNotes = data.notes || {};
+            }
+        })
+        .catch((error) => {
+            console.error('Error loading graph:', error);
+        });
+}
+
+/**
+ * Save the graph as an image with the graph name as the file name.
+ */
+/**
+ * Save the graph as an image with the graph name as the file name.
+ */
+/**
+ * Save the graph canvas as an image on the server.
+ */
+function savePhoto() {
+    // Get the graph name from the URL or a predefined variable
+    const graphName = decodeURIComponent(window.location.pathname.split('/').pop());
+
+    // Get the canvas element
+    const canvas = document.querySelector("canvas");
+    if (!canvas) {
+        showAlert("No canvas found to save!");
+        return;
+    }
+
+    try {
+        // Convert the canvas to a base64 image
+        const image = canvas.toDataURL("image/png");
+
+        // Send the image to the server
+        fetch(`/save-image/${encodeURIComponent(graphName)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ image }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.message) {
+                    showAlert(data.message);
+                } else if (data.error) {
+                    showAlert(data.error, "error");
+                }
+            })
+            .catch((error) => {
+                console.error("Error saving graph:", error);
+                showAlert("An error occurred while saving the graph.", "error");
+            });
+    } catch (error) {
+        console.error("Error capturing canvas:", error);
+        showAlert("Failed to save the graph as an image.", "error");
+    }
+}
+
+
+
+
+
 
 /**
  * Open the rename modal for the selected or new node.

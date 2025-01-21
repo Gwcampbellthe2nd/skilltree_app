@@ -4,6 +4,9 @@ import threading
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for
 from urllib.parse import unquote
 import webview
+import random
+from io import BytesIO
+from PIL import Image
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -45,15 +48,19 @@ def load_tree(tree_name):
     else:
         return jsonify({"error": f"Skill tree '{tree_name}' not found."}), 404
 
-@app.route('/delete/<tree_name>', methods=['DELETE'])
+@app.route('/delete/<tree_name>', methods=['POST'])
 def delete_tree(tree_name):
-    """Delete a specific skill tree."""
-    file_path = os.path.join(DATA_DIR, f'{tree_name}.json')
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        return jsonify({"message": f"Skill tree '{tree_name}' deleted successfully!"}), 200
-    else:
-        return jsonify({"error": f"Skill tree '{tree_name}' not found."}), 404
+    """Delete a skill tree by name."""
+    try:
+        file_path = os.path.join(DATA_DIR, f"{tree_name}.json")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            return jsonify({"message": f"Skill tree '{tree_name}' deleted successfully!"}), 200
+        else:
+            return jsonify({"error": f"Skill tree '{tree_name}' not found."}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/download/<tree_name>', methods=['GET'])
 def download_tree(tree_name):
@@ -63,6 +70,30 @@ def download_tree(tree_name):
         return send_file(file_path, as_attachment=True)
     else:
         return jsonify({"error": f"Skill tree '{tree_name}' not found."}), 404
+    
+@app.route('/save-image/<tree_name>', methods=['POST'])
+def save_canvas_image(tree_name):
+    """Save the graph canvas as a PNG image."""
+    try:
+        data = request.json.get('image')  # Get the base64 image data from the request
+        if not data:
+            return jsonify({"error": "No image data received"}), 400
+
+        # Decode the base64 image data
+        image_data = base64.b64decode(data.split(",")[1])
+
+        # Set the file path
+        output_dir = os.path.join(DATA_DIR, 'images')
+        os.makedirs(output_dir, exist_ok=True)
+        file_path = os.path.join(output_dir, f"{tree_name}.png")
+
+        # Save the image
+        with open(file_path, "wb") as f:
+            f.write(image_data)
+
+        return jsonify({"message": f"Image saved as {file_path}"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/import', methods=['POST'])
 def import_tree():
@@ -83,16 +114,16 @@ def import_tree():
     else:
         return jsonify({"error": "Invalid file type. Please upload a JSON file."}), 400
 
-def start_flask():
-    """Run the Flask app in a separate thread."""
-    app.run(debug=False, use_reloader=False)
-
+def start_flask(port):
+    """Run the Flask app on a given port."""
+    app.run(debug=True, use_reloader=False, port=port)
 
 if __name__ == '__main__':
+    import random
     # Generate a random port for Flask
     flask_port = random.randint(10000, 20000)
 
-    # Start the Flask app in a thread
+    # Start the Flask app in a thread and pass the port as an argument
     flask_thread = threading.Thread(target=start_flask, args=(flask_port,))
     flask_thread.daemon = True
     flask_thread.start()

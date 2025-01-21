@@ -1,0 +1,22 @@
+{
+    "nodes": [
+        {
+            "id": "node-1737479578270",
+            "label": "New Node",
+            "color": {
+                "background": "#b3e5fc"
+            },
+            "size": 15
+        },
+        {
+            "id": "node-1737479582054",
+            "label": "New Node",
+            "color": {
+                "background": "#b3e5fc"
+            },
+            "size": 15
+        }
+    ],
+    "edges": [],
+    "notes": {}
+}
