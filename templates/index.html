@@ -31,7 +31,7 @@
         function createNewTree() {
             const name = document.getElementById('newTreeName').value.trim();
             if (!name) {
-                alert('Please enter a tree name.');
+                showAlert('Please enter a tree name.');
                 return false;
             }
             window.location.href = `/builder/${name}`;
@@ -47,7 +47,7 @@
                 fetch(`/delete/${treeName}`, { method: 'DELETE' })
                     .then(response => response.json())
                     .then(data => {
-                        alert(data.message || data.error);
+                        showAlert(data.message || data.error);
                         location.reload();
                     });
             }

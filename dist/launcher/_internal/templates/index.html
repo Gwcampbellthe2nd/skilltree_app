@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Tree Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Skill Tree Manager</h1>
+
+    <h2>Create a New Skill Tree</h2>
+    <form onsubmit="return createNewTree()">
+        <input type="text" id="newTreeName" placeholder="Enter tree name">
+        <button type="submit">Create</button>
+    </form>
+
+    <h2>Saved Skill Trees</h2>
+    <div class="saved-trees">
+        {% for tree in trees %}
+        <div class="tree-card">
+            <h3>{{ tree }}</h3>
+            <button onclick="editTree('{{ tree }}')">Edit</button>
+            <button onclick="deleteTree('{{ tree }}')">Delete</button>
+            <a href="{{ url_for('download_tree', tree_name=tree) }}">Download</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function createNewTree() {
+            const name = document.getElementById('newTreeName').value.trim();
+            if (!name) {
+                showAlert('Please enter a tree name.');
+                return false;
+            }
+            window.location.href = `/builder/${name}`;
+            return false;
+        }
+
+        function editTree(treeName) {
+            window.location.href = `/builder/${treeName}`;
+        }
+
+        function deleteTree(treeName) {
+            if (confirm(`Are you sure you want to delete '${treeName}'?`)) {
+                fetch(`/delete/${treeName}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        showAlert(data.message || data.error);
+                        location.reload();
+                    });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 let nodes = new vis.DataSet([]);
 let edges = new vis.DataSet([]);
 let network = null;
+let nodeToRename = null; // Store the node being renamed
 
 // Object to store notes for each node
 let nodeNotes = {};
@@ -14,8 +15,8 @@ const options = {
         labelAlignment: 'below'
     },
     edges: {
-        arrows: { to: { enabled: false, scaleFactor: 0.5 } },
-        smooth: { type: 'discrete' },
+        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+        smooth: { type: 'cubicBezier' },
         color: { color: "#0288d1" },
         width: 1
     },
@@ -28,16 +29,13 @@ const options = {
     manipulation: {
         enabled: false,
         addNode: (data, callback) => {
-            data.label = prompt('Enter node label:', 'New Skill');
-            if (data.label !== null) {
-                data.size = 15; // Ensure consistent node size
-                callback(data);
-                nodeNotes[data.id] = ""; // Initialize empty notes for the new node
-            }
+            const newNodeId = `node-${Date.now()}`; // Generate a unique ID for the new node
+            nodes.add({ id: newNodeId, label: 'New Node', color: { background: '#b3e5fc' }, size: 15 }); // Add a placeholder node
+            openRenameModal(newNodeId); // Immediately open the rename modal
         },
         addEdge: (data, callback) => {
             if (data.from === data.to) {
-                alert('Cannot connect a node to itself.');
+                showAlert('Cannot connect a node to itself.');
                 return;
             }
             callback(data);
@@ -69,15 +67,11 @@ function initializeNetwork() {
         clearNotesSection();
     });
 
-    // Handle node double-click to edit label and initialize notes if missing
+    // Handle node double-click to open rename modal
     network.on("doubleClick", (params) => {
         if (params.nodes.length > 0) {
             const nodeId = params.nodes[0];
-            const node = nodes.get(nodeId);
-            const newLabel = prompt('Edit node label:', node.label);
-            if (newLabel !== null && newLabel.trim() !== '') {
-                nodes.update({ id: nodeId, label: newLabel });
-            }
+            openRenameModal(nodeId); // Open the modal for renaming
         }
     });
 }
@@ -133,7 +127,7 @@ function markNodeComplete() {
         nodes.update({ id: nodeId, color: { background: "#4caf50" } }); // Green
         updateEdges(); // Update edges after marking node as complete
     } else {
-        alert("No node selected! Please select a node to mark as complete.");
+        showAlert("No node selected! Please select a node to mark as complete.");
     }
 }
 
@@ -148,7 +142,7 @@ function markNodeNotComplete() {
         nodes.update({ id: nodeId, color: { background: "#b3e5fc" } }); // Blue
         updateEdges(); // Update edges after marking node as not complete
     } else {
-        alert("No node selected! Please select a node to mark as not complete.");
+        showAlert("No node selected! Please select a node to mark as not complete.");
     }
 }
 
@@ -177,22 +171,13 @@ function updateEdges() {
     });
 }
 
-
-/**
- * Extract the tree name from the URL path.
- */
-function getTreeNameFromURL() {
-    const pathParts = window.location.pathname.split('/');
-    return pathParts[pathParts.length - 1]; // The last part of the URL is the tree name
-}
-
 /**
  * Save the current graph (nodes and edges) to the server.
  */
 function saveGraph() {
-    const treeName = getTreeNameFromURL();
+    const treeName = decodeURIComponent(window.location.pathname.split('/').pop());
     if (!treeName) {
-        alert('No tree name found in the URL. Unable to save the skill tree.');
+        showAlert("No tree name found in the URL. Unable to save the skill tree.");
         return;
     }
 
@@ -211,24 +196,74 @@ function saveGraph() {
     })
         .then((response) => {
             if (response.ok) {
-                alert(`Skill tree '${treeName}' saved successfully!`);
+                showAlert(`Skill tree '${treeName}' saved successfully!`);
             } else {
-                alert(`Failed to save skill tree '${treeName}'.`);
+                showAlert(`Failed to save skill tree '${treeName}'.`);
             }
         })
         .catch((error) => {
             console.error('Error saving skill tree:', error);
-            alert('An error occurred while saving the skill tree.');
+            showAlert('An error occurred while saving the skill tree.');
         });
 }
 
+/**
+ * Open the rename modal for the selected or new node.
+ * @param {string} nodeId - The ID of the node to rename.
+ */
+function openRenameModal(nodeId) {
+    const renameModal = document.getElementById('renameModal');
+    const renameInput = document.getElementById('renameInput');
+    const node = nodes.get(nodeId);
 
+    if (!node) {
+        console.error('Node not found for renaming.');
+        return;
+    }
+
+    nodeToRename = nodeId; // Store the node ID for renaming
+    renameInput.value = node.label || ''; // Pre-fill with the current label, if any
+    renameModal.style.display = 'flex'; // Show the modal
+}
+
+/**
+ * Confirm the renaming of the node.
+ */
+function confirmRename() {
+    const renameModal = document.getElementById('renameModal');
+    const renameInput = document.getElementById('renameInput');
+    const newLabel = renameInput.value.trim();
+
+    if (!newLabel) {
+        showAlert('Node name cannot be empty!');
+        return;
+    }
+
+    // Update the node label
+    if (nodeToRename !== null) {
+        nodes.update({ id: nodeToRename, label: newLabel });
+        nodeToRename = null; // Clear the stored node ID
+    }
+
+    renameModal.style.display = 'none'; // Hide the modal
+}
+
+/**
+ * Close the rename modal without making changes.
+ */
+function closeRenameModal() {
+    const renameModal = document.getElementById('renameModal');
+    renameModal.style.display = 'none'; // Hide the modal
+    nodeToRename = null; // Clear the stored node ID
+}
 
 /**
  * Add a new node to the graph.
  */
 function addNode() {
-    network.addNodeMode();
+    const newNodeId = `node-${Date.now()}`; // Generate a unique ID for the new node
+    nodes.add({ id: newNodeId, label: 'New Node', color: { background: '#b3e5fc' }, size: 15 }); // Add a placeholder node
+    openRenameModal(newNodeId); // Immediately open the rename modal
 }
 
 /**
@@ -243,6 +278,38 @@ function addEdge() {
  */
 function deleteSelected() {
     network.deleteSelected();
+}
+
+/**
+ * Show a custom alert message.
+ * @param {string} message - The message to display.
+ */
+function showAlert(message) {
+    if (!message || message.trim() === '') {
+        console.warn('showAlert called with an empty or undefined message.');
+        return; // Do nothing if the message is empty or undefined
+    }
+
+    const modal = document.getElementById('customAlert');
+    const alertMessage = document.getElementById('alertMessage');
+
+    if (!modal || !alertMessage) {
+        console.error('Custom alert modal or alert message element not found.');
+        return;
+    }
+
+    alertMessage.innerText = message;
+    modal.style.display = 'flex'; // Show the modal
+}
+
+/**
+ * Close the custom alert modal.
+ */
+function closeAlert() {
+    const modal = document.getElementById('customAlert');
+    if (modal) {
+        modal.style.display = 'none'; // Hide the modal
+    }
 }
 
 // Initialize the graph
