@@ -1,19 +1,19 @@
 {
     "nodes": [
         {
-            "id": "node-1737479578270",
-            "label": "New Node",
             "color": {
                 "background": "#b3e5fc"
             },
+            "id": "node-1737479578270",
+            "label": "New Node",
             "size": 15
         },
         {
-            "id": "node-1737479582054",
-            "label": "New Node",
             "color": {
                 "background": "#b3e5fc"
             },
+            "id": "node-1737479582054",
+            "label": "New Node",
             "size": 15
         }
     ],

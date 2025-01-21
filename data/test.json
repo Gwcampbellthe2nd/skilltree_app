@@ -1,0 +1,14 @@
+{
+    "nodes": [
+        {
+            "id": "node-1737480936843",
+            "label": "New Node",
+            "color": {
+                "background": "#b3e5fc"
+            },
+            "size": 15
+        }
+    ],
+    "edges": [],
+    "notes": {}
+}

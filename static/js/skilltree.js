@@ -248,50 +248,34 @@ function loadGraph() {
 /**
  * Save the graph as an image with the graph name as the file name.
  */
-/**
- * Save the graph canvas as an image on the server.
- */
 function savePhoto() {
     // Get the graph name from the URL or a predefined variable
     const graphName = decodeURIComponent(window.location.pathname.split('/').pop());
 
-    // Get the canvas element
+    // Get the canvas element from the Vis.js network container
     const canvas = document.querySelector("canvas");
+
     if (!canvas) {
         showAlert("No canvas found to save!");
         return;
     }
 
     try {
-        // Convert the canvas to a base64 image
+        // Convert the canvas to a data URL (base64 image format)
         const image = canvas.toDataURL("image/png");
 
-        // Send the image to the server
-        fetch(`/save-image/${encodeURIComponent(graphName)}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ image }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.message) {
-                    showAlert(data.message);
-                } else if (data.error) {
-                    showAlert(data.error, "error");
-                }
-            })
-            .catch((error) => {
-                console.error("Error saving graph:", error);
-                showAlert("An error occurred while saving the graph.", "error");
-            });
+        // Create a download link
+        const link = document.createElement("a");
+        link.href = image;
+        link.download = `${graphName || "skill-tree"}.png`; // Use the graph name or default to "skill-tree.png"
+        document.body.appendChild(link); // Append to DOM to trigger download in PyWebView
+        link.click();
+        document.body.removeChild(link); // Clean up
     } catch (error) {
-        console.error("Error capturing canvas:", error);
         showAlert("Failed to save the graph as an image.", "error");
+        console.error("Error saving graph:", error);
     }
 }
-
 
 
 
