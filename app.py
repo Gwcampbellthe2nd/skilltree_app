@@ -87,6 +87,7 @@ def start_flask():
     """Run the Flask app in a separate thread."""
     app.run(debug=False, use_reloader=False)
 
+
 if __name__ == '__main__':
     # Generate a random port for Flask
     flask_port = random.randint(10000, 20000)
